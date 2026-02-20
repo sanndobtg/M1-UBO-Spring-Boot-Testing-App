@@ -8,12 +8,12 @@ import lombok.Data;
 
 @Entity
 @Data
-public class Film {
+public class Genre {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long Id;
-    private String titre;
-    private Integer anneeRealisation;
-    private Integer ageMinimum;
-    private boolean louable;
+    private String nom;
 }
+
+

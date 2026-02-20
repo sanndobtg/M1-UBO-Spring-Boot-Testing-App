@@ -1,10 +1,9 @@
 package com.entities;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Data;
+
+import java.time.LocalDate;
 
 @Entity
 @Data
@@ -12,6 +11,12 @@ public class Location {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long Id;
-    private String dateDebut;
-    private String dateFin;
+    private LocalDate dateDebut;
+    private LocalDate dateFin;
+    @ManyToOne
+    @JoinColumn(name = "compte_id")
+    private Compte compte;
+    @ManyToOne
+    @JoinColumn(name = "film_id")
+    private Film film;
 }
