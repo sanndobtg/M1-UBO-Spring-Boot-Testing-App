@@ -1,10 +1,13 @@
 ﻿services:
-  mariadb:
-    image: mariadb:latest
+  mongodb_local:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+
+  mysql_local:
+    image: mysql:8.0
+    ports:
+      - "3306:3306"
     environment:
       MYSQL_ROOT_PASSWORD: monMotDePasseSuperSecret
       MYSQL_DATABASE: test
-    volumes:
-      - ./data:/var/lib/mysql
-    ports:
-      - "3306:3306"
