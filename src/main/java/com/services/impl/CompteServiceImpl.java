@@ -27,12 +27,10 @@ public class CompteServiceImpl implements CompteService {
 
     @Override
     public CompteDto saveCompte(CompteDto compteDto) {
-
         Compte monCompte = new Compte();
-
         Compte compteSauvegarde = new Compte();
-        monCompte = compteMapper.toEntity(compteDto);
 
+        monCompte = compteMapper.toEntity(compteDto);
         compteSauvegarde =compteRepository.save(monCompte);
 
         return compteMapper.toDto(compteSauvegarde);
@@ -41,18 +39,17 @@ public class CompteServiceImpl implements CompteService {
     @Override
     @Transactional(readOnly = true)
     public CompteDto getCompteById(Long compteId) {
-
-
-
         var compte = compteRepository.findById(compteId)
                 .orElseThrow(() -> new EntityNotFoundException(
                         String.format("Le compte avec l'ID %d n'existe pas", compteId)));
+
         return compteMapper.toDto(compte);
     }
 
     @Override
     public boolean deleteCompte(Long compteId) {
         compteRepository.deleteById(compteId);
+
         return true;
     }
 

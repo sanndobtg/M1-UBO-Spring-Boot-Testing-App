@@ -33,6 +33,7 @@ public class DogMapper {
         dogDto.setId(dog.getId());
         dogDto.setName(dog.getName());
         dogDto.setRace(dog.getRace());
+
         return dogDto;
     }
 
@@ -56,6 +57,7 @@ public class DogMapper {
         }
         dog.setName(dogDto.getName());
         dog.setRace(dogDto.getRace());
+
         return dog;
     }
 } 

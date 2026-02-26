@@ -18,7 +18,6 @@ public class CompteController {
 //        this.compteService = compteService;
 //    }
 
-
     @GetMapping
     public List<CompteDto> getComptes() {
         return compteService.getAllComptes();
@@ -29,12 +28,10 @@ public class CompteController {
         return compteService.getCompteById(id);
     }
 
-
     @PostMapping
     public CompteDto saveCompte(final @RequestBody CompteDto compteDto){
         return compteService.saveCompte(compteDto);
     }
-
 
     @DeleteMapping("/{id}")
     public Boolean deleteDog(@PathVariable Long id){

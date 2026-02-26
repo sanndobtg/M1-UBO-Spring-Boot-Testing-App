@@ -60,6 +60,7 @@ public class LocationServiceImpl implements LocationService {
      */
     @Override
     public LocationDto reserverFilm(String pseudo, String titreFilm) {
+
         // Récupérer le compte
         var compte = compteRepository.findByPseudo(pseudo)
                 .orElseThrow(() -> new EntityNotFoundException(
@@ -98,7 +99,9 @@ public class LocationServiceImpl implements LocationService {
         location.setDateFin(null);
 
         var savedLocation = locationRepository.save(location);
+
         return locationMapper.toDto(savedLocation);
+
     }
 
     /**
@@ -107,6 +110,7 @@ public class LocationServiceImpl implements LocationService {
      */
     @Override
     public LocationDto terminerLocation(String pseudo, String titreFilm) {
+
         // Récupérer le compte
         var compte = compteRepository.findByPseudo(pseudo)
                 .orElseThrow(() -> new EntityNotFoundException(
@@ -128,7 +132,9 @@ public class LocationServiceImpl implements LocationService {
         // Terminer la location (mettre dateFin à aujourd'hui)
         location.setDateFin(LocalDate.now());
         var savedLocation = locationRepository.save(location);
+
         return locationMapper.toDto(savedLocation);
+
     }
 
     /**
@@ -138,6 +144,7 @@ public class LocationServiceImpl implements LocationService {
     @Override
     @Transactional(readOnly = true)
     public List<LocationDto> getLocationsEnCours(String pseudo) {
+
         var compte = compteRepository.findByPseudo(pseudo)
                 .orElseThrow(() -> new EntityNotFoundException(
                         String.format("Le compte avec le pseudo '%s' n'existe pas", pseudo)));
@@ -147,4 +154,5 @@ public class LocationServiceImpl implements LocationService {
                 .map(locationMapper::toDto)
                 .toList();
     }
+
 }

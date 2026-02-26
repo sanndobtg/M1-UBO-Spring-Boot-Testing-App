@@ -16,4 +16,5 @@ public class Artiste {
     private String nom;
     private String prenom;
     private RoleArtiste role;
+
 }

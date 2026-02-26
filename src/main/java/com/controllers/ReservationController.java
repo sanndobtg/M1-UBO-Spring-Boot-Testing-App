@@ -17,13 +17,19 @@ public class ReservationController {
         this.locationService = locationService;
     }
 
-
+    /**
+     * GET /reservations/me
+     * Récupère la liste des films loués par l'utilisateur connecté.
+     */
     @GetMapping("/me")
     public List<LocationDto> getFilmsEnLocation(@RequestHeader("X-User-Pseudo") String pseudo) {
         return locationService.getLocationsEnCours(pseudo);
     }
 
-
+    /**
+     * POST /reservations/{titreFilm}
+     * Réserver un film.
+     */
     @PostMapping("/{titreFilm}")
     @ResponseStatus(HttpStatus.CREATED)
     public LocationDto reserverFilm(@PathVariable String titreFilm,
@@ -31,7 +37,10 @@ public class ReservationController {
         return locationService.reserverFilm(pseudo, titreFilm);
     }
 
-
+    /**
+     * DELETE /reservations/{titreFilm}
+     * Terminer la location d'un film.
+     */
     @DeleteMapping("/{titreFilm}")
     public LocationDto terminerLocation(@PathVariable String titreFilm,
                                         @RequestHeader("X-User-Pseudo") String pseudo) {

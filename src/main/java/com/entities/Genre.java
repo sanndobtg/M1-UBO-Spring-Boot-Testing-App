@@ -14,6 +14,7 @@ public class Genre {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long Id;
     private String nom;
+
 }
 
 
