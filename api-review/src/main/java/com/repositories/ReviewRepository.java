@@ -28,7 +28,7 @@ public class ReviewRepository {
         }
 
         MongoClient mongoClient = MongoClients.create(mongoUrl);
-        MongoDatabase database = mongoClient.getDatabase("vod_db");
+        MongoDatabase database = mongoClient.getDatabase("mps_db");
         this.collection = database.getCollection("reviews");
     }
 

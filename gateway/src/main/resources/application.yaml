@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: 11080
 
 spring:
   application:
@@ -7,26 +7,26 @@ spring:
   cloud:
     gateway:
       routes:
-        # API Reservation
-        - id: api-reservation
-          uri: http://api-reservation:PORT_RESERVATION
-          predicates:
-            - Path=/reservations/**
-
         # API User
         - id: api-user
-          uri: http://api-user:PORT_USER
+          uri: http://api-user:11081
           predicates:
             - Path=/users/**
 
-        # API Review (à compléter)
-        #- id: api-review
-        #  uri: http://api-review:PORT_REVIEW
-        #  predicates:
-        #    - Path=/reviews/**
+        # API Reservation
+        - id: api-reservation
+          uri: http://api-reservation:11082
+          predicates:
+            - Path=/reservations/**
 
-        # API Poster (à compléter)
+        # API Review
+        - id: api-review
+          uri: http://api-review:11083
+          predicates:
+            - Path=/reviews/**
+
+        # API Poster (à activer plus tard)
         #- id: api-poster
-        #  uri: http://api-poster:PORT_POSTER
+        #  uri: http://api-poster:11084
         #  predicates:
         #    - Path=/posters/**
