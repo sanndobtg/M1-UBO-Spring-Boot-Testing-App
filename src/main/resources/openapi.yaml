@@ -1,138 +1,148 @@
 openapi: 3.0.3
 info:
-  title: API de Gestion des Chiens
-  description: |
-    API REST permettant la gestion des chiens dans le système.
-    Cette API permet de créer, lire, mettre à jour et supprimer des informations sur les chiens.
+  title: Poster API
   version: 1.0.0
-  contact:
-    name: Support API
-    email: support@example.com
+  description: API de gestion des posters de films
 
 servers:
   - url: http://localhost:8080
-    description: Serveur de développement local
-
-tags:
-  - name: dogs
-    description: Opérations liées à la gestion des chiens
 
 paths:
-  /dogs:
+
+  /posters/{titreFilm}:
     get:
-      tags:
-        - dogs
-      summary: Récupère tous les chiens
-      description: Retourne la liste complète des chiens enregistrés dans le système
-      operationId: getAllDogs
+      summary: Liste les posters d'un film
+      parameters:
+        - name: titreFilm
+          in: path
+          required: true
+          schema:
+            type: string
       responses:
         '200':
-          description: Liste des chiens récupérée avec succès
+          description: Liste des posters
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/DogDto'
-        '500':
-          description: Erreur serveur interne
+                  $ref: '#/components/schemas/Poster'
+        '400':
+          description: Titre du film manquant
 
     post:
-      tags:
-        - dogs
-      summary: Crée un nouveau chien
-      description: Ajoute un nouveau chien dans le système
-      operationId: createDog
+      summary: Ajouter un poster à un film
+      parameters:
+        - name: titreFilm
+          in: path
+          required: true
+          schema:
+            type: string
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/DogDto'
+              type: object
+              required:
+                - nom
+              properties:
+                nom:
+                  type: string
+                  example: https://image.tmdb.org/titanic1.jpg
       responses:
         '201':
-          description: Chien créé avec succès
+          description: Poster créé
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DogDto'
+                type: object
+                properties:
+                  id:
+                    type: string
+                    example: 69a1dc2e7635c42a0a8563b6
         '400':
           description: Données invalides
-        '500':
-          description: Erreur serveur interne
 
-  /dogs/{id}:
+  /posters/{posterId}:
     get:
-      tags:
-        - dogs
-      summary: Récupère un chien par son ID
-      description: Retourne les détails d'un chien spécifique
-      operationId: getDogById
+      summary: Récupérer un poster par ID
       parameters:
-        - name: id
+        - name: posterId
           in: path
-          description: ID du chien à récupérer
           required: true
           schema:
-            type: integer
-            format: int64
+            type: string
+            pattern: "^[0-9a-fA-F]{24}$"
       responses:
         '200':
-          description: Chien trouvé
+          description: Poster trouvé
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DogDto'
+                $ref: '#/components/schemas/Poster'
+        '400':
+          description: ID invalide
         '404':
-          description: Chien non trouvé
-        '500':
-          description: Erreur serveur interne
+          description: Poster non trouvé
+
+    put:
+      summary: Modifier un poster
+      parameters:
+        - name: posterId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: "^[0-9a-fA-F]{24}$"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - nom
+              properties:
+                nom:
+                  type: string
+                  example: https://image.tmdb.org/titanic-new.jpg
+      responses:
+        '200':
+          description: Poster modifié
+        '400':
+          description: ID ou données invalides
+        '404':
+          description: Poster non trouvé
 
     delete:
-      tags:
-        - dogs
-      summary: Supprime un chien
-      description: Supprime un chien du système par son ID
-      operationId: deleteDog
+      summary: Supprimer un poster
       parameters:
-        - name: id
+        - name: posterId
           in: path
-          description: ID du chien à supprimer
           required: true
           schema:
-            type: integer
-            format: int64
+            type: string
+            pattern: "^[0-9a-fA-F]{24}$"
       responses:
-        '200':
-          description: Chien supprimé avec succès
-          content:
-            application/json:
-              schema:
-                type: boolean
+        '204':
+          description: Poster supprimé
+        '400':
+          description: ID invalide
         '404':
-          description: Chien non trouvé
-        '500':
-          description: Erreur serveur interne
+          description: Poster non trouvé
 
 components:
   schemas:
-    DogDto:
+    Poster:
       type: object
-      description: Représentation d'un chien dans le système
       properties:
-        id:
-          type: integer
-          format: int64
-          description: Identifiant unique du chien
-          example: 1
-        name:
+        _id:
           type: string
-          description: Nom du chien
-          example: "Rex"
-        race:
+          example: 69a1dc2e7635c42a0a8563b6
+        titreFilm:
           type: string
-          description: Race du chien
-          example: "Berger Allemand"
-      required:
-        - name
-        - race 
+          example: Titanic
+        nom:
+          type: string
+          example: https://image.tmdb.org/titanic1.jpg
