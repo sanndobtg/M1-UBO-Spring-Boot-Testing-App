@@ -60,4 +60,12 @@ public class CompteServiceImpl implements CompteService {
                 .map(compteMapper::toDto)
                 .toList();
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public CompteDto login(String pseudo, String motDePasse) {
+        return compteRepository.findByPseudoAndMotDePasse(pseudo, motDePasse)
+                .map(compteMapper::toDto)
+                .orElseThrow(() -> new EntityNotFoundException("Identifiants incorrects"));
+    }
 }

@@ -38,4 +38,9 @@ public class CompteController {
         return compteService.deleteCompte(id);
     }
 
+    @PostMapping("/login")
+    public CompteDto login(@RequestBody CompteDto compteDto) {
+        return compteService.login(compteDto.getPseudo(), compteDto.getMotDePasse());
+    }
+
 }
