@@ -11,7 +11,7 @@ spring:
         - id: api-user
           uri: http://api-user:11081
           predicates:
-            - Path=/users/**
+            - Path=/comptes/**
 
         # API Reservation
         - id: api-reservation
