@@ -7,7 +7,7 @@
     image: mariadb:latest
     environment:
       MYSQL_ROOT_PASSWORD: monMotDePasseSuperSecret
-      MYSQL_DATABASE: vod_db
+      MYSQL_DATABASE: mps_db
     volumes:
       - ./data/mariadb:/var/lib/mysql
     ports:
@@ -33,7 +33,8 @@
     ports:
       - "11081:11081"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://mariadb:3306/vod_db
+      SERVER_PORT: 11081
+      SPRING_DATASOURCE_URL: jdbc:mysql://mariadb:3306/mps_db
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: monMotDePasseSuperSecret
     depends_on:
@@ -47,7 +48,8 @@
     ports:
       - "11082:11082"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://mariadb:3306/vod_db
+      SERVER_PORT: 11082
+      SPRING_DATASOURCE_URL: jdbc:mysql://mariadb:3306/mps_db
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: monMotDePasseSuperSecret
     depends_on:
@@ -61,6 +63,7 @@
     ports:
       - "11083:11083"
     environment:
+      SERVER_PORT: 11083
       MONGODB_URI: mongodb://obiwan:27017
     depends_on:
       - mariadb
@@ -73,4 +76,5 @@
   #  ports:
   #    - "11084:11084"
   #  environment:
+  #    SERVER_PORT: 11084
   #    MONGODB_URI: mongodb://obiwan:27017
