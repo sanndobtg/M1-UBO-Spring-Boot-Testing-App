@@ -76,7 +76,7 @@
               <label class="field-label"><span class="label-prefix">&gt;</span> MOT DE PASSE</label>
               <div class="input-wrapper">
                 <span class="input-icon">◉</span>
-                <input v-model="form.motDePasse" :type="showPwd ? 'text' : 'password'" class="cyber-input" placeholder="••••••••" required />
+                <input v-model="form.mdp" :type="showPwd ? 'text' : 'password'" class="cyber-input" placeholder="••••••••" required />
                 <button type="button" class="toggle-pwd" @click="showPwd = !showPwd">{{ showPwd ? '◎' : '◉' }}</button>
               </div>
             </div>
@@ -137,12 +137,12 @@ const loading = ref(false)
 
 const form = ref({
   pseudo: '', nom: '', prenom: '', dateDeNaissance: '',
-  adresse: '', motDePasse: '', confirmPassword: ''
+  adresse: '', mdp: '', confirmPassword: ''
 })
 
 // Password strength
 const strengthPct = computed(() => {
-  const pwd = form.value.motDePasse
+  const pwd = form.value.mdp
   if (!pwd) return 0
   let score = 0
   if (pwd.length >= 8) score += 25
@@ -169,8 +169,8 @@ const strengthLabel = computed(() => {
 const handleRegister = async () => {
   error.value = ''
 
-  // ICI : Utilise motDePasse au lieu de password
-  if (form.value.motDePasse !== form.value.confirmPassword) {
+  // ICI : Utilise mdp au lieu de password
+  if (form.value.mdp !== form.value.confirmPassword) {
     error.value = 'Les mots de passe ne correspondent pas.'
     return
   }
@@ -183,11 +183,11 @@ const handleRegister = async () => {
       prenom: form.value.prenom,
       dateDeNaissance: form.value.dateDeNaissance,
       adresse: form.value.adresse,
-      motDePasse: form.value.motDePasse, // <--- ICI
+      mdp: form.value.mdp, // <--- ICI
     })
 
     // ICI AUSSI pour le login automatique après inscription
-    await auth.login(form.value.pseudo, form.value.motDePasse)
+   // await auth.login(form.value.pseudo, form.value.mdp)
     router.push('/')
   } catch (e) {
     error.value = e.response?.data?.message || 'Erreur lors de l\'inscription.'
