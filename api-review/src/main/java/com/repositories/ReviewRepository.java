@@ -24,7 +24,7 @@ public class ReviewRepository {
         // En Docker : mongodb://mongodb:27017
         String mongoUrl = System.getenv("MONGODB_URI");
         if (mongoUrl == null || mongoUrl.isBlank()) {
-            mongoUrl = "mongodb://localhost:27017";
+            mongoUrl = "mongodb://poster-mongodb:27017";
         }
 
         MongoClient mongoClient = MongoClients.create(mongoUrl);
