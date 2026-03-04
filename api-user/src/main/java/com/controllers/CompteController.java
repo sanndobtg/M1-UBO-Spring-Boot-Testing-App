@@ -38,4 +38,9 @@ public class CompteController {
         return compteService.deleteCompte(id);
     }
 
+    @PutMapping("/{id}")
+    public CompteDto updateCompte(@PathVariable Long id, @RequestBody CompteDto compteDto) {
+        return compteService.updateCompte(id, compteDto);
+    }
+
 }
