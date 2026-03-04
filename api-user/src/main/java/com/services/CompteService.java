@@ -16,4 +16,6 @@ public interface CompteService {
 
 
     List<CompteDto> getAllComptes();
+
+    CompteDto updateCompte(Long id, CompteDto compteDto);
 }
