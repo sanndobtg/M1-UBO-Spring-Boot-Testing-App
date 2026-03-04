@@ -25,8 +25,8 @@ spring:
           predicates:
             - Path=/reviews/**
 
-        # API Poster (à activer plus tard)
-        #- id: api-poster
-        #  uri: http://api-poster:11084
-        #  predicates:
-        #    - Path=/posters/**
+        # API Poster
+        - id: api-poster
+          uri: http://api-poster:11084
+          predicates:
+            - Path=/posters/**

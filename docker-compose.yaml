@@ -69,12 +69,12 @@
       - mariadb
 
   # ──────────────────────────────────────
-  #  API POSTER (à ajouter plus tard)
+  #  API POSTER
   # ──────────────────────────────────────
-  #api-poster:
-  #  image: sanndobtg/vod-api-poster:latest
-  #  ports:
-  #    - "11084:11084"
-  #  environment:
-  #    SERVER_PORT: 11084
-  #    MONGODB_URI: mongodb://obiwan:27017
+  api-poster:
+    image: sanndobtg/vod-api-poster:latest
+    ports:
+      - "11084:11084"
+    environment:
+      SERVER_PORT: 11084
+      MONGODB_URI: mongodb://obiwan:27017
