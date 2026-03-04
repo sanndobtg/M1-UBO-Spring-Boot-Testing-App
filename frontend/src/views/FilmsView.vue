@@ -85,6 +85,9 @@ async function loadFilms() {
   }
 }
 
+
+
+
 async function addFilm() {
   try {
     const res = await filmService.create(newFilm.value)
