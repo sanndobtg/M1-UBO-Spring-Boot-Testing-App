@@ -12,8 +12,16 @@ public class PosterRepository {
     private final MongoCollection<Document> collection;
 
     public PosterRepository() {
-        MongoClient mongoClient = MongoClients.create("mongodb://localhost:27017");
-        MongoDatabase database = mongoClient.getDatabase("vod_db");
+        // URL configurable via variable d'environnement (pour Docker)
+        // En local : mongodb://localhost:27017
+        // En Docker : mongodb://mongodb:27017
+        String mongoUrl = System.getenv("MONGODB_URI");
+        if (mongoUrl == null || mongoUrl.isBlank()) {
+            mongoUrl = "mongodb://poster-mongodb:27017";
+        }
+
+        MongoClient mongoClient = MongoClients.create(mongoUrl);
+        MongoDatabase database = mongoClient.getDatabase("mps_db");
         this.collection = database.getCollection("posters");
     }
 
