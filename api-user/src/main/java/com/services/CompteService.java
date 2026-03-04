@@ -18,4 +18,6 @@ public interface CompteService {
     List<CompteDto> getAllComptes();
 
     CompteDto login(String pseudo, String motDePasse);
+
+    CompteDto updateCompte(Long id, CompteDto compteDto);
 }

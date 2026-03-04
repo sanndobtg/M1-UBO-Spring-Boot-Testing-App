@@ -1,30 +1,17 @@
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 
+const FAC = 'http://info-tpsi.univ-brest.fr:11080'
+
 export default defineConfig({
   plugins: [vue()],
   server: {
     proxy: {
-      '/comptes': {
-        target: 'http://info-tpsi:11081',
+      '/api': {
+        target: FAC,
         changeOrigin: true,
-      },
-      '/reservations': {
-        target: 'http://localhost:11080',
-        changeOrigin: true,
-      },
-      '/reviews': {
-        target: 'http://localhost:11080',
-        changeOrigin: true,
-      },
-      '/films': {
-        target: 'http://localhost:11080',
-        changeOrigin: true,
-      },
-      '/posters': {
-        target: 'http://localhost:11080',
-        changeOrigin: true,
-      },
+        rewrite: (path) => path.replace(/^\/api/, '')  // /api/comptes → /comptes
+      }
     }
   }
 })

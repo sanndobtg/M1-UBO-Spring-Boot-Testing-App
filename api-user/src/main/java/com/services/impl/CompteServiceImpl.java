@@ -68,4 +68,23 @@ public class CompteServiceImpl implements CompteService {
                 .map(compteMapper::toDto)
                 .orElseThrow(() -> new EntityNotFoundException("Identifiants incorrects"));
     }
+
+
+    @Override
+    public CompteDto updateCompte(Long id, CompteDto compteDto) {
+        Compte compte = compteRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(
+                        String.format("Le compte avec l'ID %d n'existe pas", id)));
+
+        // Met à jour uniquement les champs non null
+        if (compteDto.getPseudo() != null) compte.setPseudo(compteDto.getPseudo());
+        if (compteDto.getNom() != null) compte.setNom(compteDto.getNom());
+        if (compteDto.getPrenom() != null) compte.setPrenom(compteDto.getPrenom());
+        if (compteDto.getDateDeNaissance() != null) compte.setDateDeNaissance(compteDto.getDateDeNaissance());
+        if (compteDto.getAdresse() != null) compte.setAdresse(compteDto.getAdresse());
+        if (compteDto.getRole() != null) compte.setRole(compteDto.getRole());
+        if (compteDto.getMotDePasse() != null) compte.setMotDePasse(compteDto.getMotDePasse());
+
+        return compteMapper.toDto(compteRepository.save(compte));
+    }
 }

@@ -42,5 +42,9 @@ public class CompteController {
     public CompteDto login(@RequestBody CompteDto compteDto) {
         return compteService.login(compteDto.getPseudo(), compteDto.getMotDePasse());
     }
+    @PutMapping("/{id}")
+    public CompteDto updateCompte(@PathVariable Long id, @RequestBody CompteDto compteDto) {
+        return compteService.updateCompte(id, compteDto);
+    }
 
 }
