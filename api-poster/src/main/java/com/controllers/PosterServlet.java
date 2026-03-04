@@ -27,8 +27,24 @@ public class PosterServlet extends HttpServlet {
     private final PosterRepository repo = new PosterRepository();
     private final ObjectMapper mapper = new ObjectMapper();
 
+    /** Injecte les headers CORS sur toutes les réponses */
+    private void addCorsHeaders(HttpServletResponse resp) {
+        resp.setHeader("Access-Control-Allow-Origin", "*");
+        resp.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+        resp.setHeader("Access-Control-Allow-Headers", "Content-Type");
+    }
+
+    /** Gère le preflight OPTIONS envoyé par le navigateur avant POST/PUT/DELETE */
+    @Override
+    protected void doOptions(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        addCorsHeaders(resp);
+        resp.setStatus(200);
+    }
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        addCorsHeaders(resp);
+
         String pathInfo = req.getPathInfo();
         if (pathInfo == null || pathInfo.equals("/")) {
             resp.sendError(400, "Titre du film manquant dans l'URL");
@@ -57,6 +73,8 @@ public class PosterServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        addCorsHeaders(resp);
+
         String pathInfo = req.getPathInfo();
         if (pathInfo == null || pathInfo.equals("/")) {
             resp.sendError(400, "Titre du film manquant dans l'URL");
@@ -81,6 +99,8 @@ public class PosterServlet extends HttpServlet {
 
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        addCorsHeaders(resp);
+
         String pathInfo = req.getPathInfo();
         if (pathInfo == null || pathInfo.equals("/")) {
             resp.sendError(400, "ID du poster manquant");
@@ -110,6 +130,8 @@ public class PosterServlet extends HttpServlet {
 
     @Override
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        addCorsHeaders(resp);
+
         String pathInfo = req.getPathInfo();
         if (pathInfo == null || pathInfo.equals("/")) {
             resp.sendError(400, "ID du poster manquant");
