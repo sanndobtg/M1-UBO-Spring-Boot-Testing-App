@@ -8,18 +8,45 @@
     <template v-else-if="film">
       <!-- Hero banner -->
       <div class="film-hero">
-        <div class="hero-backdrop" :style="film.affiche ? `background-image: url(${film.affiche})` : ''"></div>
+        <div class="hero-backdrop" :style="poster ? `background-image: url(${poster.nom})` : ''"></div>
         <div class="hero-overlay"></div>
 
         <div class="container hero-content">
           <!-- Poster -->
           <div class="poster-wrap">
             <div class="poster-frame">
-              <img v-if="film.affiche" :src="film.affiche" :alt="film.titre" class="poster" />
+              <img v-if="poster" :src="poster.nom" :alt="film.titre" class="poster" />
               <div v-else class="poster-placeholder">
                 <span class="placeholder-icon">◈</span>
-                <span class="placeholder-text">{{ film.titre?.split(' ').map(w => w[0]).join('').slice(0,3) }}</span>
+                <span class="placeholder-text">{{ film.title?.split(' ').map(w => w[0]).join('').slice(0,3) }}</span>
               </div>
+            </div>
+
+            <!-- Poster actions (toujours visibles) -->
+            <div class="poster-actions">
+              <template v-if="poster">
+                <button class="btn-poster-action" @click="openEditPoster" title="Modifier le poster">✎ Modifier</button>
+                <button class="btn-poster-action btn-poster-delete" @click="deletePoster" title="Supprimer le poster">✕ Supprimer</button>
+              </template>
+              <button v-else class="btn-poster-action btn-poster-add" @click="openAddPoster" title="Ajouter un poster">＋ Ajouter un poster</button>
+            </div>
+
+            <!-- Formulaire inline poster -->
+            <div v-if="showPosterForm" class="poster-form-inline">
+              <input
+                v-model="posterUrl"
+                class="cyber-input-modal"
+                placeholder="https://image.tmdb.org/..."
+                @keyup.enter="savePoster"
+                @keyup.escape="showPosterForm = false"
+              />
+              <div class="poster-form-btns">
+                <button class="btn-cyber" @click="savePoster" :disabled="!posterUrl.trim() || savingPoster">
+                  <span>{{ savingPoster ? '...' : 'OK' }}</span>
+                </button>
+                <button class="btn-poster-action" @click="showPosterForm = false">Annuler</button>
+              </div>
+              <div v-if="posterError" class="pay-error">⚠ {{ posterError }}</div>
             </div>
           </div>
 
@@ -31,19 +58,19 @@
               <span v-if="film.ageMin" class="tag tag-pink">{{ film.ageMin }}+</span>
             </div>
 
-            <h1 class="film-title">{{ film.titre }}</h1>
+            <h1 class="film-title">{{ film.title}}</h1>
 
-            <p v-if="film.realisateur" class="film-director">
+            <p v-if="film.director" class="film-director">
               <span class="meta-label">RÉALISÉ PAR</span>
-              <span class="meta-value">{{ film.realisateur }}</span>
+              <span class="meta-value">{{ film.director }}</span>
             </p>
 
             <!-- Cast -->
-            <div v-if="film.acteurs?.length" class="film-cast">
+            <div v-if="film.actors?.length" class="film-cast">
               <span class="meta-label">AVEC</span>
               <span class="cast-list">
-                <span v-for="(a, i) in film.acteurs.slice(0, 5)" :key="a" class="actor">
-                  {{ a }}<span v-if="i < Math.min(film.acteurs.length, 5) - 1">, </span>
+                <span v-for="(a, i) in film.actors.slice(0, 5)" :key="a" class="actor">
+                  {{ a }}<span v-if="i < Math.min(film.actors.length, 5) - 1">, </span>
                 </span>
               </span>
             </div>
@@ -202,10 +229,88 @@ const submittingReview = ref(false)
 const newReview = ref({ note: 0, commentaire: '' })
 const card = ref({ numero: '', expiration: '', cvv: '' })
 
+// --- Poster state ---
+const poster = ref(null) // { _id, titreFilm, nom }
+const showPosterForm = ref(false)
+const posterUrl = ref('')
+const savingPoster = ref(false)
+const posterError = ref('')
+const isEditingPoster = ref(false)
+
+const POSTER_API = 'http://info-tpsi:11084/posters'
+
 const avgRating = computed(() => {
   if (!reviews.value.length) return null
   return reviews.value.reduce((s, r) => s + r.note, 0) / reviews.value.length
 })
+
+// --- Poster functions ---
+const fetchPoster = async (titreFilm) => {
+  try {
+    const res = await fetch(`${POSTER_API}/${encodeURIComponent(titreFilm)}`)
+    const list = await res.json()
+    console.log('posters reçus :', list) // ← vérifiez la structure ici
+    poster.value = list.length ? list[0] : null
+  } catch (e) {
+    console.error('fetchPoster error:', e)
+    poster.value = null
+  }
+}
+
+const openAddPoster = () => {
+  isEditingPoster.value = false
+  posterUrl.value = ''
+  posterError.value = ''
+  showPosterForm.value = true
+}
+
+const openEditPoster = () => {
+  isEditingPoster.value = true
+  posterUrl.value = poster.value.nom
+  posterError.value = ''
+  showPosterForm.value = true
+}
+
+const savePoster = async () => {
+  if (!posterUrl.value.trim()) return
+  savingPoster.value = true
+  posterError.value = ''
+  try {
+    if (isEditingPoster.value) {
+      const res = await fetch(`${POSTER_API}/${poster.value._id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nom: posterUrl.value.trim() })
+      })
+      if (!res.ok) throw new Error()
+      poster.value = { ...poster.value, nom: posterUrl.value.trim() }
+    } else {
+      const res = await fetch(`${POSTER_API}/${encodeURIComponent(film.value.title)}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nom: posterUrl.value.trim() })
+      })
+      if (!res.ok) throw new Error()
+      const data = await res.json()
+      poster.value = { _id: data.id, titreFilm: film.value.title, nom: posterUrl.value.trim() }
+    }
+    showPosterForm.value = false
+  } catch {
+    posterError.value = 'Erreur lors de la sauvegarde.'
+  } finally {
+    savingPoster.value = false
+  }
+}
+
+const deletePoster = async () => {
+  if (!confirm('Supprimer ce poster ?')) return
+  try {
+    await fetch(`${POSTER_API}/${poster.value._id}`, { method: 'DELETE' })
+    poster.value = null
+  } catch {
+    // silencieux
+  }
+}
 
 onMounted(async () => {
   const id = route.params.id
@@ -228,6 +333,10 @@ onMounted(async () => {
     ]
   } finally {
     loading.value = false
+  }
+
+  if (film.value?.title) {
+    await fetchPoster(film.value.title)
   }
 })
 
@@ -339,7 +448,12 @@ const submitReview = async () => {
 }
 
 /* Poster */
-.poster-wrap { flex-shrink: 0; }
+.poster-wrap {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
 
 .poster-frame {
   width: 220px;
@@ -374,6 +488,57 @@ const submitReview = async () => {
   font-weight: 900;
   color: rgba(0, 245, 255, 0.15);
   letter-spacing: 0.2em;
+}
+
+/* Poster actions */
+.poster-actions {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.btn-poster-action {
+  background: rgba(0, 245, 255, 0.05);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-muted);
+  border-radius: 4px;
+  padding: 4px 10px;
+  font-size: 0.72rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: var(--font-mono);
+  letter-spacing: 0.05em;
+}
+
+.btn-poster-action:hover {
+  border-color: var(--neon-cyan);
+  color: var(--neon-cyan);
+}
+
+.btn-poster-delete:hover {
+  border-color: var(--neon-pink);
+  color: var(--neon-pink);
+}
+
+.btn-poster-add:hover {
+  border-color: var(--neon-cyan);
+  color: var(--neon-cyan);
+  box-shadow: 0 0 8px rgba(0, 245, 255, 0.2);
+}
+
+/* Poster form inline */
+.poster-form-inline {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 220px;
+}
+
+.poster-form-btns {
+  display: flex;
+  gap: 6px;
+  align-items: center;
 }
 
 /* Film info */
@@ -799,5 +964,6 @@ const submitReview = async () => {
 @media (max-width: 768px) {
   .hero-content { flex-direction: column; align-items: flex-start; }
   .poster-frame { width: 150px; }
+  .poster-form-inline { width: 150px; }
 }
 </style>

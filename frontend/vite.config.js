@@ -6,23 +6,23 @@ export default defineConfig({
   server: {
     proxy: {
       '/comptes': {
-        target: 'http://info-tpsi:11081',
+        target: 'http://info-tpsi:11080',
         changeOrigin: true,
       },
       '/reservations': {
-        target: 'http://localhost:11080',
+        target: 'http://info-tpsi:11080',
         changeOrigin: true,
       },
       '/reviews': {
-        target: 'http://localhost:11080',
+        target: 'http://info-tpsi:11080',
         changeOrigin: true,
       },
-      '/films': {
-        target: 'http://localhost:11080',
+      '/movies': {
+        target: 'http://info-tpsi:11040',
         changeOrigin: true,
       },
       '/posters': {
-        target: 'http://localhost:11080',
+        target: 'http://info-tpsi:11080',
         changeOrigin: true,
       },
     }

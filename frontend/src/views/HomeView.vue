@@ -120,12 +120,41 @@ const router = useRouter()
 const films = ref([])
 const loading = ref(true)
 
+const POSTER_API = 'http://info-tpsi:11084/posters'
+
+// Récupère le poster d'un film et retourne l'URL ou null
+const fetchPosterUrl = async (titre) => {
+  if (!titre) return null
+  try {
+    const res = await fetch(`${POSTER_API}/${encodeURIComponent(titre)}`)
+    const list = await res.json()
+    if (list.length) {
+      const p = list[0]
+      return p.nom || null
+    }
+    return null
+  } catch {
+    return null
+  }
+}
+
 onMounted(async () => {
   try {
     const res = await filmService.getAll()
-    films.value = (res.data || []).slice(0, 6)
+    const rawFilms = (res.data || []).slice(0, 6)
+
+    // Récupère tous les posters en parallèle
+    const posterUrls = await Promise.all(
+      rawFilms.map(f => fetchPosterUrl(f.title || f.titre))
+    )
+
+    // Injecte l'affiche dans chaque objet film
+    films.value = rawFilms.map((f, i) => ({
+      ...f,
+      affiche: posterUrls[i] || null
+    }))
   } catch (e) {
-    // use mock data for demo
+    // Données mock sans posters (fallback)
     films.value = mockFilms
   } finally {
     loading.value = false
@@ -142,12 +171,12 @@ const features = [
 ]
 
 const mockFilms = [
-  { id: 1, titre: 'Blade Runner 2049', annee: 2017, genre: ['Sci-Fi', 'Thriller'], prix: 3.99, ouvert: true },
-  { id: 2, titre: 'Dune', annee: 2021, genre: ['Sci-Fi', 'Aventure'], prix: 4.49, ouvert: true },
-  { id: 3, titre: 'The Matrix', annee: 1999, genre: ['Sci-Fi', 'Action'], prix: 2.99, ouvert: true },
-  { id: 4, titre: 'Ghost in the Shell', annee: 1995, genre: ['Anime', 'Sci-Fi'], prix: 2.49, ouvert: false },
-  { id: 5, titre: 'Akira', annee: 1988, genre: ['Anime', 'Cyberpunk'], prix: 1.99, ouvert: true },
-  { id: 6, titre: 'Ex Machina', annee: 2014, genre: ['Sci-Fi', 'Drama'], prix: 3.49, ouvert: true },
+  { id: 1, titre: 'Blade Runner 2049', annee: 2017, genre: ['Sci-Fi', 'Thriller'], prix: 3.99, ouvert: true, affiche: null },
+  { id: 2, titre: 'Dune', annee: 2021, genre: ['Sci-Fi', 'Aventure'], prix: 4.49, ouvert: true, affiche: null },
+  { id: 3, titre: 'The Matrix', annee: 1999, genre: ['Sci-Fi', 'Action'], prix: 2.99, ouvert: true, affiche: null },
+  { id: 4, titre: 'Ghost in the Shell', annee: 1995, genre: ['Anime', 'Sci-Fi'], prix: 2.49, ouvert: false, affiche: null },
+  { id: 5, titre: 'Akira', annee: 1988, genre: ['Anime', 'Cyberpunk'], prix: 1.99, ouvert: true, affiche: null },
+  { id: 6, titre: 'Ex Machina', annee: 2014, genre: ['Sci-Fi', 'Drama'], prix: 3.49, ouvert: true, affiche: null },
 ]
 </script>
 
