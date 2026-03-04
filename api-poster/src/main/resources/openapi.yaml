@@ -1,0 +1,148 @@
+openapi: 3.0.3
+info:
+  title: Poster API
+  version: 1.0.0
+  description: API de gestion des posters de films
+
+servers:
+  - url: http://localhost:8080
+
+paths:
+
+  /posters/{titreFilm}:
+    get:
+      summary: Liste les posters d'un film
+      parameters:
+        - name: titreFilm
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Liste des posters
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Poster'
+        '400':
+          description: Titre du film manquant
+
+    post:
+      summary: Ajouter un poster à un film
+      parameters:
+        - name: titreFilm
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - nom
+              properties:
+                nom:
+                  type: string
+                  example: https://image.tmdb.org/titanic1.jpg
+      responses:
+        '201':
+          description: Poster créé
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    example: 69a1dc2e7635c42a0a8563b6
+        '400':
+          description: Données invalides
+
+  /posters/{posterId}:
+    get:
+      summary: Récupérer un poster par ID
+      parameters:
+        - name: posterId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: "^[0-9a-fA-F]{24}$"
+      responses:
+        '200':
+          description: Poster trouvé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Poster'
+        '400':
+          description: ID invalide
+        '404':
+          description: Poster non trouvé
+
+    put:
+      summary: Modifier un poster
+      parameters:
+        - name: posterId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: "^[0-9a-fA-F]{24}$"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - nom
+              properties:
+                nom:
+                  type: string
+                  example: https://image.tmdb.org/titanic-new.jpg
+      responses:
+        '200':
+          description: Poster modifié
+        '400':
+          description: ID ou données invalides
+        '404':
+          description: Poster non trouvé
+
+    delete:
+      summary: Supprimer un poster
+      parameters:
+        - name: posterId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: "^[0-9a-fA-F]{24}$"
+      responses:
+        '204':
+          description: Poster supprimé
+        '400':
+          description: ID invalide
+        '404':
+          description: Poster non trouvé
+
+components:
+  schemas:
+    Poster:
+      type: object
+      properties:
+        _id:
+          type: string
+          example: 69a1dc2e7635c42a0a8563b6
+        titreFilm:
+          type: string
+          example: Titanic
+        nom:
+          type: string
+          example: https://image.tmdb.org/titanic1.jpg

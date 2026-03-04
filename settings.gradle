@@ -1,1 +1,8 @@
-rootProject.name = 'demo'
+rootProject.name = 'M1-UBO-Spring-Boot-Testing-App'
+
+include 'common'
+include 'api-reservation'
+include 'api-user'
+include 'gateway'
+include 'api-review'
+include 'api-poster'

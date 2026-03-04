@@ -1,10 +1,80 @@
 ﻿services:
+
+  # ──────────────────────────────────────
+  #  BASE DE DONNÉES
+  # ──────────────────────────────────────
   mariadb:
     image: mariadb:latest
     environment:
       MYSQL_ROOT_PASSWORD: monMotDePasseSuperSecret
-      MYSQL_DATABASE: test
+      MYSQL_DATABASE: mps_db
     volumes:
-      - ./data:/var/lib/mysql
+      - ./data/mariadb:/var/lib/mysql
     ports:
-      - "3306:3306"
+      - "11085:3306"
+
+  # ──────────────────────────────────────
+  #  API GATEWAY
+  # ──────────────────────────────────────
+  gateway:
+    image: sanndobtg/vod-gateway:latest
+    ports:
+      - "11080:11080"
+    depends_on:
+      - api-user
+      - api-reservation
+      - api-review
+
+  # ──────────────────────────────────────
+  #  API USER
+  # ──────────────────────────────────────
+  api-user:
+    image: sanndobtg/vod-api-user:latest
+    ports:
+      - "11081:11081"
+    environment:
+      SERVER_PORT: 11081
+      SPRING_DATASOURCE_URL: jdbc:mysql://mariadb:3306/mps_db
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: monMotDePasseSuperSecret
+    depends_on:
+      - mariadb
+
+  # ──────────────────────────────────────
+  #  API RESERVATION
+  # ──────────────────────────────────────
+  api-reservation:
+    image: sanndobtg/vod-api-reservation:latest
+    ports:
+      - "11082:11082"
+    environment:
+      SERVER_PORT: 11082
+      SPRING_DATASOURCE_URL: jdbc:mysql://mariadb:3306/mps_db
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: monMotDePasseSuperSecret
+    depends_on:
+      - mariadb
+
+  # ──────────────────────────────────────
+  #  API REVIEW
+  # ──────────────────────────────────────
+  api-review:
+    image: sanndobtg/vod-api-review:latest
+    ports:
+      - "11083:11083"
+    environment:
+      SERVER_PORT: 11083
+      MONGODB_URI: mongodb://obiwan:27017
+    depends_on:
+      - mariadb
+
+  # ──────────────────────────────────────
+  #  API POSTER
+  # ──────────────────────────────────────
+  api-poster:
+    image: sanndobtg/vod-api-poster:latest
+    ports:
+      - "11084:11084"
+    environment:
+      SERVER_PORT: 11084
+      MONGODB_URI: mongodb://obiwan:27017

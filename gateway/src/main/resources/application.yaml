@@ -1,0 +1,32 @@
+server:
+  port: 11080
+
+spring:
+  application:
+    name: gateway
+  cloud:
+    gateway:
+      routes:
+        # API User
+        - id: api-user
+          uri: http://api-user:11081
+          predicates:
+            - Path=/comptes/**
+
+        # API Reservation
+        - id: api-reservation
+          uri: http://api-reservation:11082
+          predicates:
+            - Path=/reservations/**
+
+        # API Review
+        - id: api-review
+          uri: http://api-review:11083
+          predicates:
+            - Path=/reviews/**
+
+        # API Poster
+        - id: api-poster
+          uri: http://api-poster:11084
+          predicates:
+            - Path=/posters/**

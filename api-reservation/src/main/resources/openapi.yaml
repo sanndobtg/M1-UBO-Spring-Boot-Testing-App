@@ -1,0 +1,623 @@
+openapi: 3.0.3
+info:
+  title: API de Gestion des Chiens et Réservations VOD
+  description: |
+    API REST permettant la gestion des chiens dans le système
+    et la gestion des réservations / locations de films (VOD).
+  version: 1.0.0
+  contact:
+    name: Support API
+    email: support@example.com
+
+servers:
+  - url: http://localhost:8080
+    description: Serveur de développement local
+
+tags:
+  - name: dogs
+    description: Opérations liées à la gestion des chiens
+  - name: reservations
+    description: Opérations liées à la location de films (VOD)
+
+paths:
+  # ──────────────────────────────────────────
+  #  DOGS
+  # ──────────────────────────────────────────
+  /dogs:
+    get:
+      tags:
+        - dogs
+      summary: Récupère tous les chiens
+      description: Retourne la liste complète des chiens enregistrés dans le système
+      operationId: getAllDogs
+      responses:
+        '200':
+          description: Liste des chiens récupérée avec succès
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DogDto'
+        '500':
+          description: Erreur serveur interne
+
+    post:
+      tags:
+        - dogs
+      summary: Crée un nouveau chien
+      description: Ajoute un nouveau chien dans le système
+      operationId: createDog
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DogDto'
+      responses:
+        '201':
+          description: Chien créé avec succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DogDto'
+        '400':
+          description: Données invalides
+        '500':
+          description: Erreur serveur interne
+
+  /dogs/{id}:
+    get:
+      tags:
+        - dogs
+      summary: Récupère un chien par son ID
+      description: Retourne les détails d'un chien spécifique
+      operationId: getDogById
+      parameters:
+        - name: id
+          in: path
+          description: ID du chien à récupérer
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Chien trouvé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DogDto'
+        '404':
+          description: Chien non trouvé
+        '500':
+          description: Erreur serveur interne
+
+    delete:
+      tags:
+        - dogs
+      summary: Supprime un chien
+      description: Supprime un chien du système par son ID
+      operationId: deleteDog
+      parameters:
+        - name: id
+          in: path
+          description: ID du chien à supprimer
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Chien supprimé avec succès
+          content:
+            application/json:
+              schema:
+                type: boolean
+        '404':
+          description: Chien non trouvé
+        '500':
+          description: Erreur serveur interne
+
+  # ──────────────────────────────────────────
+  #  RESERVATIONS
+  # ──────────────────────────────────────────
+  /reservations/me:
+    get:
+      tags:
+        - reservations
+      summary: Films en location
+      description: Récupère la liste des films actuellement loués par l'utilisateur connecté (dateFin == null).
+      operationId: getFilmsEnLocation
+      parameters:
+        - name: X-User-Pseudo
+          in: header
+          description: Pseudo de l'utilisateur connecté
+          required: true
+          schema:
+            type: string
+          example: "john"
+      responses:
+        '200':
+          description: Liste des locations en cours récupérée avec succès
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LocationDto'
+        '404':
+          description: Compte non trouvé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Erreur serveur interne
+
+  /reservations/{titreFilm}:
+    post:
+      tags:
+        - reservations
+      summary: Réserver un film
+      description: |
+        Crée une location pour le film spécifié.
+        Contraintes vérifiées :
+        - Le film doit être louable
+        - L'utilisateur ne doit pas avoir plus de 3 locations en cours
+        - L'âge de l'utilisateur doit être supérieur ou égal à l'âge minimum du film
+      operationId: reserverFilm
+      parameters:
+        - name: titreFilm
+          in: path
+          description: Titre du film à réserver
+          required: true
+          schema:
+            type: string
+          example: "Inception"
+        - name: X-User-Pseudo
+          in: header
+          description: Pseudo de l'utilisateur connecté
+          required: true
+          schema:
+            type: string
+          example: "john"
+      responses:
+        '201':
+          description: Réservation effectuée avec succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LocationDto'
+        '403':
+          description: Quota de 3 films atteint, âge insuffisant ou film non louable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Film ou compte non trouvé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Erreur serveur interne
+
+    delete:openapi: 3.0.3
+info:
+  title: API de Gestion des Chiens et Réservations VOD
+  description: |
+    API REST permettant la gestion des chiens dans le système
+    et la gestion des réservations / locations de films (VOD).
+  version: 1.0.0
+  contact:
+    name: Support API
+    email: support@example.com
+
+servers:
+  - url: http://localhost:8080
+    description: Serveur de développement local
+
+tags:
+  - name: dogs
+    description: Opérations liées à la gestion des chiens
+  - name: reservations
+    description: Opérations liées à la location de films (VOD)
+
+paths:
+  # ──────────────────────────────────────────
+  #  DOGS
+  # ──────────────────────────────────────────
+  /dogs:
+    get:
+      tags:
+        - dogs
+      summary: Récupère tous les chiens
+      description: Retourne la liste complète des chiens enregistrés dans le système
+      operationId: getAllDogs
+      responses:
+        '200':
+          description: Liste des chiens récupérée avec succès
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DogDto'
+        '500':
+          description: Erreur serveur interne
+
+    post:
+      tags:
+        - dogs
+      summary: Crée un nouveau chien
+      description: Ajoute un nouveau chien dans le système
+      operationId: createDog
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DogDto'
+      responses:
+        '201':
+          description: Chien créé avec succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DogDto'
+        '400':
+          description: Données invalides
+        '500':
+          description: Erreur serveur interne
+
+  /dogs/{id}:
+    get:
+      tags:
+        - dogs
+      summary: Récupère un chien par son ID
+      description: Retourne les détails d'un chien spécifique
+      operationId: getDogById
+      parameters:
+        - name: id
+          in: path
+          description: ID du chien à récupérer
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Chien trouvé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DogDto'
+        '404':
+          description: Chien non trouvé
+        '500':
+          description: Erreur serveur interne
+
+    delete:
+      tags:
+        - dogs
+      summary: Supprime un chien
+      description: Supprime un chien du système par son ID
+      operationId: deleteDog
+      parameters:
+        - name: id
+          in: path
+          description: ID du chien à supprimer
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Chien supprimé avec succès
+          content:
+            application/json:
+              schema:
+                type: boolean
+        '404':
+          description: Chien non trouvé
+        '500':
+          description: Erreur serveur interne
+
+  # ──────────────────────────────────────────
+  #  RESERVATIONS
+  # ──────────────────────────────────────────
+  /reservations/me:
+    get:
+      tags:
+        - reservations
+      summary: Films en location
+      description: Récupère la liste des films actuellement loués par l'utilisateur connecté (dateFin == null).
+      operationId: getFilmsEnLocation
+      parameters:
+        - name: X-User-Pseudo
+          in: header
+          description: Pseudo de l'utilisateur connecté
+          required: true
+          schema:
+            type: string
+          example: "john"
+      responses:
+        '200':
+          description: Liste des locations en cours récupérée avec succès
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LocationDto'
+        '404':
+          description: Compte non trouvé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Erreur serveur interne
+
+  /reservations/{titreFilm}:
+    post:
+      tags:
+        - reservations
+      summary: Réserver un film
+      description: |
+        Crée une location pour le film spécifié.
+        Contraintes vérifiées :
+        - Le film doit être louable
+        - L'utilisateur ne doit pas avoir plus de 3 locations en cours
+        - L'âge de l'utilisateur doit être supérieur ou égal à l'âge minimum du film
+      operationId: reserverFilm
+      parameters:
+        - name: titreFilm
+          in: path
+          description: Titre du film à réserver
+          required: true
+          schema:
+            type: string
+          example: "Inception"
+        - name: X-User-Pseudo
+          in: header
+          description: Pseudo de l'utilisateur connecté
+          required: true
+          schema:
+            type: string
+          example: "john"
+      responses:
+        '201':
+          description: Réservation effectuée avec succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LocationDto'
+        '403':
+          description: Quota de 3 films atteint, âge insuffisant ou film non louable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Film ou compte non trouvé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Erreur serveur interne
+
+    delete:
+      tags:
+        - reservations
+      summary: Terminer la location
+      description: Termine la location du film spécifié en mettant la dateFin à aujourd'hui.
+      operationId: terminerLocation
+      parameters:
+        - name: titreFilm
+          in: path
+          description: Titre du film à rendre
+          required: true
+          schema:
+            type: string
+          example: "Inception"
+        - name: X-User-Pseudo
+          in: header
+          description: Pseudo de l'utilisateur connecté
+          required: true
+          schema:
+            type: string
+          example: "john"
+      responses:
+        '200':
+          description: Film rendu avec succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LocationDto'
+        '404':
+          description: Film, compte ou location en cours non trouvé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Erreur serveur interne
+
+components:
+  schemas:
+    DogDto:
+      type: object
+      description: Représentation d'un chien dans le système
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Identifiant unique du chien
+          example: 1
+        name:
+          type: string
+          description: Nom du chien
+          example: "Rex"
+        race:
+          type: string
+          description: Race du chien
+          example: "Berger Allemand"
+      required:
+        - name
+        - race
+
+    LocationDto:
+      type: object
+      description: Représentation d'une location de film
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Identifiant unique de la location
+          example: 1
+        pseudo:
+          type: string
+          description: Pseudo de l'utilisateur qui a loué le film
+          example: "john"
+        filmId:
+          type: integer
+          format: int64
+          description: Identifiant du film loué
+          example: 42
+        titreFilm:
+          type: string
+          description: Titre du film loué
+          example: "Inception"
+        dateDebut:
+          type: string
+          format: date
+          description: Date de début de la location
+          example: "2026-02-25"
+        dateFin:
+          type: string
+          format: date
+          nullable: true
+          description: Date de fin de la location (null si en cours)
+          example: null
+        enCours:
+          type: boolean
+          description: Indique si la location est en cours (dateFin == null)
+          example: true
+
+    ErrorResponse:
+      type: object
+      description: Réponse d'erreur retournée par l'API
+      properties:
+        error:
+          type: string
+          description: Message décrivant l'erreur
+          example: "Le film 'xxx' n'existe pas"
+      tags:
+        - reservations
+      summary: Terminer la location
+      description: Termine la location du film spécifié en mettant la dateFin à aujourd'hui.
+      operationId: terminerLocation
+      parameters:
+        - name: titreFilm
+          in: path
+          description: Titre du film à rendre
+          required: true
+          schema:
+            type: string
+          example: "Inception"
+        - name: X-User-Pseudo
+          in: header
+          description: Pseudo de l'utilisateur connecté
+          required: true
+          schema:
+            type: string
+          example: "john"
+      responses:
+        '200':
+          description: Film rendu avec succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LocationDto'
+        '404':
+          description: Film, compte ou location en cours non trouvé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Erreur serveur interne
+
+components:
+  schemas:
+    DogDto:
+      type: object
+      description: Représentation d'un chien dans le système
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Identifiant unique du chien
+          example: 1
+        name:
+          type: string
+          description: Nom du chien
+          example: "Rex"
+        race:
+          type: string
+          description: Race du chien
+          example: "Berger Allemand"
+      required:
+        - name
+        - race
+
+    LocationDto:
+      type: object
+      description: Représentation d'une location de film
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Identifiant unique de la location
+          example: 1
+        pseudo:
+          type: string
+          description: Pseudo de l'utilisateur qui a loué le film
+          example: "john"
+        filmId:
+          type: integer
+          format: int64
+          description: Identifiant du film loué
+          example: 42
+        titreFilm:
+          type: string
+          description: Titre du film loué
+          example: "Inception"
+        dateDebut:
+          type: string
+          format: date
+          description: Date de début de la location
+          example: "2026-02-25"
+        dateFin:
+          type: string
+          format: date
+          nullable: true
+          description: Date de fin de la location (null si en cours)
+          example: null
+        enCours:
+          type: boolean
+          description: Indique si la location est en cours (dateFin == null)
+          example: true
+
+    ErrorResponse:
+      type: object
+      description: Réponse d'erreur retournée par l'API
+      properties:
+        error:
+          type: string
+          description: Message décrivant l'erreur
+          example: "Le film 'xxx' n'existe pas"
