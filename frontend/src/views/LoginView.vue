@@ -105,7 +105,7 @@ const handleLogin = async () => {
   error.value = ''
   loading.value = true
   try {
-    // ICI : on utilise motDePasse au lieu de password
+
     await auth.login(form.value.pseudo, form.value.motDePasse)
     router.push('/')
   } catch (e) {

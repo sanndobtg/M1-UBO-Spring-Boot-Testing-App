@@ -6,7 +6,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/comptes': {
-        target: 'http://localhost:11080',
+        target: 'http://info-tpsi:11081',
         changeOrigin: true,
       },
       '/reservations': {
