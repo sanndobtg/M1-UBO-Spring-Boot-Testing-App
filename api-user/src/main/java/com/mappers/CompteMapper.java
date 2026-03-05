@@ -16,7 +16,7 @@ public class CompteMapper {
         CompteDto compteDto = new CompteDto();
         compteDto.setId(compte.getId());
         compteDto.setAdresse(compte.getAdresse());
-        compteDto.setMotDePasse(compte.getMotDePasse());
+        compteDto.setMdp(compte.getMotDePasse());
         compteDto.setNom(compte.getNom());
         compteDto.setPrenom(compte.getPrenom());
         compteDto.setPseudo(compte.getPseudo());
@@ -37,7 +37,7 @@ public class CompteMapper {
         }
 
         compte.setAdresse(compteDto.getAdresse());
-        compte.setMotDePasse(compteDto.getMotDePasse());
+        compte.setMotDePasse(compteDto.getMdp());
         compte.setNom(compteDto.getNom());
         compte.setPrenom(compteDto.getPrenom());
         compte.setPseudo(compteDto.getPseudo());

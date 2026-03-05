@@ -40,7 +40,7 @@ public class CompteController {
 
     @PostMapping("/login")
     public CompteDto login(@RequestBody CompteDto compteDto) {
-        return compteService.login(compteDto.getPseudo(), compteDto.getMotDePasse());
+        return compteService.login(compteDto.getPseudo(), compteDto.getMdp());
     }
 
     @PutMapping("/{id}")
