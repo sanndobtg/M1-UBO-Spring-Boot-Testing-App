@@ -8,6 +8,6 @@ import java.util.Optional;
 
 @Repository
 public interface CompteRepository extends JpaRepository<Compte, Long> {
-
+    Optional<Compte> findByPseudoAndMotDePasse(String pseudo, String motDePasse);
     Optional<Compte> findByPseudo(String pseudo);
 }

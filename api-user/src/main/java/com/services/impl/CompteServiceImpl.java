@@ -61,6 +61,15 @@ public class CompteServiceImpl implements CompteService {
                 .toList();
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public CompteDto login(String pseudo, String motDePasse) {
+        return compteRepository.findByPseudoAndMotDePasse(pseudo, motDePasse)
+                .map(compteMapper::toDto)
+                .orElseThrow(() -> new EntityNotFoundException("Identifiants incorrects"));
+    }
+
+    @Override
     public CompteDto updateCompte(Long id, CompteDto compteDto) {
         Compte compte = compteRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(

@@ -1,8 +1,5 @@
 ﻿services:
 
-  # ──────────────────────────────────────
-  #  BASE DE DONNÉES
-  # ──────────────────────────────────────
   mariadb:
     image: mariadb:latest
     container_name: mariadb
@@ -14,25 +11,19 @@
     ports:
       - "11085:3306"
 
-  # ──────────────────────────────────────
-  #  API GATEWAY
-  # ──────────────────────────────────────
   gateway:
     image: sanndobtg/vod-gateway:latest
     ports:
-      - "11080:11080"
+      - "11080:8080"   # corrigé
     depends_on:
       - api-user
       - api-reservation
       - api-review
 
-  # ──────────────────────────────────────
-  #  API USER
-  # ──────────────────────────────────────
   api-user:
     image: sanndobtg/vod-api-user:latest
     ports:
-      - "11081:11081"
+      - "11081:8082"   # corrigé
     environment:
       SERVER_PORT: 11081
       SPRING_DATASOURCE_URL: jdbc:mysql://mariadb:3306/mps_db
@@ -41,13 +32,10 @@
     depends_on:
       - mariadb
 
-  # ──────────────────────────────────────
-  #  API RESERVATION
-  # ──────────────────────────────────────
   api-reservation:
     image: sanndobtg/vod-api-reservation:latest
     ports:
-      - "11082:11082"
+      - "11082:8081"   # corrigé
     environment:
       SERVER_PORT: 11082
       SPRING_DATASOURCE_URL: jdbc:mysql://mariadb:3306/mps_db
@@ -56,13 +44,10 @@
     depends_on:
       - mariadb
 
-  # ──────────────────────────────────────
-  #  API REVIEW
-  # ──────────────────────────────────────
   api-review:
     image: sanndobtg/vod-api-review:latest
     ports:
-      - "11083:11083"
+      - "11083:8083"   # corrigé (probable)
     environment:
       SERVER_PORT: 11083
       MONGODB_URI: mongodb://obiwan:27017

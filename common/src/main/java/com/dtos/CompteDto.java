@@ -13,28 +13,19 @@ import lombok.Setter;
 @AllArgsConstructor
 public class CompteDto {
 
-
     private Long Id;
-
 
     private RoleCompte role;
 
-
     private String pseudo;
-
 
     private String nom;
 
-
     private String prenom;
 
-
     private String dateDeNaissance;
-
 
     private String adresse;
 
     private String mdp;
-
-
 }

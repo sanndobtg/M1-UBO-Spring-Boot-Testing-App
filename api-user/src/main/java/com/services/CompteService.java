@@ -8,14 +8,13 @@ public interface CompteService {
 
     CompteDto saveCompte(CompteDto compteDto);
 
-
     CompteDto getCompteById(Long compteId);
-
 
     boolean deleteCompte(Long compteId);
 
-
     List<CompteDto> getAllComptes();
+
+    CompteDto login(String pseudo, String motDePasse);
 
     CompteDto updateCompte(Long id, CompteDto compteDto);
 }

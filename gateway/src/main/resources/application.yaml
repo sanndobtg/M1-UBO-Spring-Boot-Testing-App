@@ -1,27 +1,41 @@
 server:
-  port: 11080
+  port: 8080
 
 spring:
   application:
     name: gateway
   cloud:
     gateway:
+      # Configuration CORS : Autorise ton frontend à parler à la Gateway
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins: "http://localhost:5173"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+            allowedHeaders: "*"
+            allowCredentials: true
+
       routes:
-        # API User
+        # Route pour l'API USER (Comptes)
         - id: api-user
-          uri: http://api-user:11081
+          uri: http://api-user:8082
           predicates:
             - Path=/comptes/**
 
-        # API Reservation
+        # Route pour l'API RESERVATION (Réservations et Films)
         - id: api-reservation
-          uri: http://api-reservation:11082
+          uri: http://api-reservation:8081
           predicates:
-            - Path=/reservations/**
+            - Path=/reservations/**, /films/**
 
-        # API Review
+        # Route pour l'API REVIEW (Commentaires)
         - id: api-review
-          uri: http://api-review:11083
+          uri: http://api-review:8083
           predicates:
             - Path=/reviews/**
 
