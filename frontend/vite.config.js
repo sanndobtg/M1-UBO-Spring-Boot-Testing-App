@@ -11,7 +11,27 @@ export default defineConfig({
         target: FAC,
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, '')  // /api/comptes → /comptes
-      }
+      },
+      '/comptes': {
+        target: 'http://info-tpsi:11080',
+        changeOrigin: true,
+      },
+      '/reservations': {
+        target: 'http://info-tpsi:11080',
+        changeOrigin: true,
+      },
+      '/reviews': {
+        target: 'http://info-tpsi:11080',
+        changeOrigin: true,
+      },
+      '/movies': {
+        target: 'http://info-tpsi:11040',
+        changeOrigin: true,
+      },
+      '/posters': {
+        target: 'http://info-tpsi:11080',
+        changeOrigin: true,
+      },
     }
   }
 })

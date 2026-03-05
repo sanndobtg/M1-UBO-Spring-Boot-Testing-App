@@ -11,8 +11,8 @@
       <!-- Hero -->
       <div class="film-hero">
         <div
-          class="hero-backdrop"
-          :style="mainPoster ? `background-image: url(${mainPoster})` : ''"
+            class="hero-backdrop"
+            :style="(mainPoster || poster?.nom) ? `background-image: url(${mainPoster || poster.nom})` : ''"
         ></div>
         <div class="hero-overlay"></div>
 
@@ -21,13 +21,40 @@
           <!-- Poster -->
           <div class="poster-wrap">
             <div class="poster-frame">
-              <img v-if="mainPoster" :src="mainPoster" :alt="film.titre" class="poster" />
+              <img v-if="mainPoster || poster" :src="mainPoster || poster.nom" :alt="film.titre || film.title" class="poster" />
               <div v-else class="poster-placeholder">
                 <span class="placeholder-icon">◈</span>
                 <span class="placeholder-text">
-                  {{ film.titre?.split(' ').map(w => w[0]).join('').slice(0, 3) }}
+                  {{ (film.titre || film.title)?.split(' ').map(w => w[0]).join('').slice(0,3) }}
                 </span>
               </div>
+            </div>
+
+            <!-- Poster actions (toujours visibles) -->
+            <div class="poster-actions">
+              <template v-if="poster">
+                <button class="btn-poster-action" @click="openEditPoster" title="Modifier le poster">✎ Modifier</button>
+                <button class="btn-poster-action btn-poster-delete" @click="deletePoster" title="Supprimer le poster">✕ Supprimer</button>
+              </template>
+              <button v-else class="btn-poster-action btn-poster-add" @click="openAddPoster" title="Ajouter un poster">＋ Ajouter un poster</button>
+            </div>
+
+            <!-- Formulaire inline poster -->
+            <div v-if="showPosterForm" class="poster-form-inline">
+              <input
+                  v-model="posterUrl"
+                  class="cyber-input-modal"
+                  placeholder="https://image.tmdb.org/..."
+                  @keyup.enter="savePoster"
+                  @keyup.escape="showPosterForm = false"
+              />
+              <div class="poster-form-btns">
+                <button class="btn-cyber" @click="savePoster" :disabled="!posterUrl.trim() || savingPoster">
+                  <span>{{ savingPoster ? '...' : 'OK' }}</span>
+                </button>
+                <button class="btn-poster-action" @click="showPosterForm = false">Annuler</button>
+              </div>
+              <div v-if="posterError" class="pay-error">⚠ {{ posterError }}</div>
             </div>
           </div>
 
@@ -39,16 +66,18 @@
               <span v-if="film.ageMin" class="tag tag-pink">{{ film.ageMin }}+</span>
             </div>
 
-            <h1 class="film-title">{{ film.titre }}</h1>
+            <h1 class="film-title">{{ film.titre || film.title }}</h1>
 
-            <p v-if="film.realisateur" class="film-meta">
+            <p v-if="film.realisateur || film.director" class="film-meta">
               <span class="meta-label">RÉALISÉ PAR</span>
-              <span class="meta-value">{{ film.realisateur }}</span>
+              <span class="meta-value">{{ film.realisateur || film.director }}</span>
             </p>
 
-            <div v-if="film.acteurs?.length" class="film-meta">
+            <div v-if="film.acteurs?.length || film.actors?.length" class="film-meta">
               <span class="meta-label">AVEC</span>
-              <span class="meta-value">{{ film.acteurs.slice(0, 4).join(', ') }}</span>
+              <span class="meta-value">
+                {{ (film.acteurs || film.actors).slice(0,5).join(', ') }}
+              </span>
             </div>
 
             <!-- Rating depuis api-review -->
@@ -69,17 +98,17 @@
                 </div>
                 <template v-if="auth.isLoggedIn">
                   <button
-                    v-if="!alreadyRented"
-                    class="btn-cyber btn-reserve"
-                    @click="openPayModal"
+                      v-if="!alreadyRented"
+                      class="btn-cyber btn-reserve"
+                      @click="openPayModal"
                   >
                     <span>LOUER CE FILM</span>
                   </button>
                   <button
-                    v-else
-                    class="btn-cyber btn-rented"
-                    @click="terminer"
-                    :disabled="terminating"
+                      v-else
+                      class="btn-cyber btn-rented"
+                      @click="terminer"
+                      :disabled="terminating"
                   >
                     <span>{{ terminating ? '...' : '✓ EN LOCATION — TERMINER' }}</span>
                   </button>
@@ -98,13 +127,13 @@
               <span class="thumbs-label">AFFICHES</span>
               <div class="thumbs-row">
                 <img
-                  v-for="p in posters.slice(0, 5)"
-                  :key="p._id"
-                  :src="p.nom"
-                  class="thumb"
-                  :class="{ active: p.nom === mainPoster }"
-                  @click="mainPoster = p.nom"
-                  @error="$event.target.style.display='none'"
+                    v-for="p in posters.slice(0, 5)"
+                    :key="p._id"
+                    :src="p.nom"
+                    class="thumb"
+                    :class="{ active: p.nom === mainPoster }"
+                    @click="mainPoster = p.nom"
+                    @error="$event.target.style.display='none'"
                 />
               </div>
             </div>
@@ -123,28 +152,28 @@
             <h3 class="form-title">Votre évaluation</h3>
             <div class="star-picker">
               <span
-                v-for="i in 5"
-                :key="i"
-                class="star-pick"
-                :class="{ active: i <= newReview.note }"
-                @click="newReview.note = i"
+                  v-for="i in 5"
+                  :key="i"
+                  class="star-pick"
+                  :class="{ active: i <= newReview.note }"
+                  @click="newReview.note = i"
               >★</span>
               <span class="star-label">{{ newReview.note > 0 ? newReview.note + '/5' : 'Choisir une note' }}</span>
             </div>
             <textarea
-              v-model="newReview.commentaire"
-              class="review-textarea"
-              placeholder="Commentaire facultatif..."
-              rows="3"
+                v-model="newReview.commentaire"
+                class="review-textarea"
+                placeholder="Commentaire facultatif..."
+                rows="3"
             ></textarea>
             <Transition name="fade">
               <div v-if="reviewError" class="review-error">⚠ {{ reviewError }}</div>
             </Transition>
             <div class="form-actions">
               <button
-                class="btn-cyber"
-                @click="submitReview"
-                :disabled="newReview.note === 0 || submittingReview"
+                  class="btn-cyber"
+                  @click="submitReview"
+                  :disabled="newReview.note === 0 || submittingReview"
               >
                 <span>{{ submittingReview ? 'ENVOI...' : 'PUBLIER' }}</span>
               </button>
@@ -195,7 +224,7 @@
             </div>
             <div class="modal-body">
               <div class="pay-summary">
-                <span class="pay-film">{{ film?.titre }}</span>
+                <span class="pay-film">{{ film?.titre || film?.title }}</span>
                 <span class="pay-price neon-text">{{ film?.prix?.toFixed(2) }} €</span>
               </div>
               <div class="field-group">
@@ -228,7 +257,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import filmService from '../services/filmService'
@@ -239,6 +268,7 @@ import reservationService from '../services/reservationService'
 const route = useRoute()
 const auth = useAuthStore()
 
+// Film state
 const film = ref(null)
 const loading = ref(true)
 const reviews = ref([])
@@ -248,6 +278,17 @@ const posters = ref([])
 const mainPoster = ref(null)
 const alreadyRented = ref(false)
 const hasRentedBefore = ref(false)
+
+// Poster CRUD state
+const poster = ref(null)
+const showPosterForm = ref(false)
+const posterUrl = ref('')
+const savingPoster = ref(false)
+const posterError = ref('')
+const isEditingPoster = ref(false)
+const POSTER_API = 'http://info-tpsi:11084/posters'
+
+// Payment & review state
 const showPayModal = ref(false)
 const paying = ref(false)
 const payError = ref('')
@@ -257,10 +298,76 @@ const reviewError = ref('')
 const newReview = ref({ note: 0, commentaire: '' })
 const card = ref({ numero: '', expiration: '', cvv: '' })
 
+// --- Poster functions ---
+const fetchPoster = async (titreFilm) => {
+  try {
+    const res = await fetch(`${POSTER_API}/${encodeURIComponent(titreFilm)}`)
+    const list = await res.json()
+    poster.value = list.length ? list[0] : null
+  } catch {
+    poster.value = null
+  }
+}
+
+const openAddPoster = () => {
+  isEditingPoster.value = false
+  posterUrl.value = ''
+  posterError.value = ''
+  showPosterForm.value = true
+}
+
+const openEditPoster = () => {
+  isEditingPoster.value = true
+  posterUrl.value = poster.value.nom
+  posterError.value = ''
+  showPosterForm.value = true
+}
+
+const savePoster = async () => {
+  if (!posterUrl.value.trim()) return
+  savingPoster.value = true
+  posterError.value = ''
+  try {
+    if (isEditingPoster.value) {
+      const res = await fetch(`${POSTER_API}/${poster.value._id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nom: posterUrl.value.trim() })
+      })
+      if (!res.ok) throw new Error()
+      poster.value = { ...poster.value, nom: posterUrl.value.trim() }
+    } else {
+      const res = await fetch(`${POSTER_API}/${encodeURIComponent(film.value.title || film.value.titre)}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nom: posterUrl.value.trim() })
+      })
+      if (!res.ok) throw new Error()
+      const data = await res.json()
+      poster.value = { _id: data.id, titreFilm: film.value.title || film.value.titre, nom: posterUrl.value.trim() }
+    }
+    showPosterForm.value = false
+  } catch {
+    posterError.value = 'Erreur lors de la sauvegarde.'
+  } finally {
+    savingPoster.value = false
+  }
+}
+
+const deletePoster = async () => {
+  if (!confirm('Supprimer ce poster ?')) return
+  try {
+    await fetch(`${POSTER_API}/${poster.value._id}`, { method: 'DELETE' })
+    poster.value = null
+  } catch {
+    // silencieux
+  }
+}
+
+// --- Mounted ---
 onMounted(async () => {
   const id = route.params.id
 
-  // Charger le film
   try {
     const res = await filmService.getById(id)
     film.value = res.data
@@ -270,25 +377,25 @@ onMounted(async () => {
     loading.value = false
   }
 
-  if (!film.value?.titre) return
-  const titre = film.value.titre
+  const titre = film.value?.titre || film.value?.title
+  if (!titre) return
 
-  // Charger posters, reviews, moyenne en parallèle
   await Promise.allSettled([
     loadPosters(titre),
     loadReviews(titre),
     loadAverage(titre),
     auth.isLoggedIn ? checkReservation(titre) : Promise.resolve(),
   ])
+
+  await fetchPoster(titre)
 })
 
+// --- Loaders ---
 async function loadPosters(titre) {
   try {
     const res = await posterService.getByFilm(titre)
     posters.value = res.data || []
-    if (posters.value.length > 0) {
-      mainPoster.value = posters.value[0].nom
-    }
+    if (posters.value.length > 0) mainPoster.value = posters.value[0].nom
   } catch { posters.value = [] }
 }
 
@@ -316,6 +423,7 @@ async function checkReservation(titre) {
   } catch { alreadyRented.value = false }
 }
 
+// --- Payment & review ---
 const openPayModal = () => {
   showPayModal.value = true
   payError.value = ''
@@ -326,7 +434,7 @@ const confirmPayment = async () => {
   paying.value = true
   payError.value = ''
   try {
-    await reservationService.reserver(film.value.titre)
+    await reservationService.reserver(film.value.titre || film.value.title)
     showPayModal.value = false
     alreadyRented.value = true
     hasRentedBefore.value = true
@@ -340,21 +448,18 @@ const confirmPayment = async () => {
 const terminer = async () => {
   terminating.value = true
   try {
-    await reservationService.terminerLocation(film.value.titre)
+    await reservationService.terminerLocation(film.value.titre || film.value.title)
     alreadyRented.value = false
     hasRentedBefore.value = true
-  } catch (e) {
-    console.error(e)
-  } finally {
-    terminating.value = false
-  }
+  } catch { }
+  finally { terminating.value = false }
 }
 
 const submitReview = async () => {
   reviewError.value = ''
   submittingReview.value = true
   try {
-    await reviewService.addReview(film.value.titre, {
+    await reviewService.addReview(film.value.titre || film.value.title, {
       note: newReview.value.note,
       commentaire: newReview.value.commentaire,
     })
@@ -366,9 +471,7 @@ const submitReview = async () => {
     newReview.value = { note: 0, commentaire: '' }
   } catch (e) {
     reviewError.value = e.response?.data?.message || 'Erreur lors de l\'envoi.'
-  } finally {
-    submittingReview.value = false
-  }
+  } finally { submittingReview.value = false }
 }
 </script>
 
@@ -422,7 +525,13 @@ const submitReview = async () => {
   display: flex; gap: 3rem; align-items: flex-end; width: 100%;
 }
 
-.poster-wrap { flex-shrink: 0; }
+/* Poster */
+.poster-wrap {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
 
 .poster-frame {
   width: 220px; aspect-ratio: 2/3;
@@ -441,7 +550,64 @@ const submitReview = async () => {
 .placeholder-icon { font-size: 3rem; color: rgba(0,245,255,0.2); }
 .placeholder-text { font-family: var(--font-display); font-size: 2rem; font-weight: 900; color: rgba(0,245,255,0.15); letter-spacing: 0.2em; }
 
-.film-info { flex: 1; display: flex; flex-direction: column; gap: 1rem; }
+/* Poster actions */
+.poster-actions {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.btn-poster-action {
+  background: rgba(0, 245, 255, 0.05);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-muted);
+  border-radius: 4px;
+  padding: 4px 10px;
+  font-size: 0.72rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: var(--font-mono);
+  letter-spacing: 0.05em;
+}
+
+.btn-poster-action:hover {
+  border-color: var(--neon-cyan);
+  color: var(--neon-cyan);
+}
+
+.btn-poster-delete:hover {
+  border-color: var(--neon-pink);
+  color: var(--neon-pink);
+}
+
+.btn-poster-add:hover {
+  border-color: var(--neon-cyan);
+  color: var(--neon-cyan);
+  box-shadow: 0 0 8px rgba(0, 245, 255, 0.2);
+}
+
+/* Poster form inline */
+.poster-form-inline {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 220px;
+}
+
+.poster-form-btns {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+/* Film info */
+.film-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
 
 .info-tags { display: flex; flex-wrap: wrap; gap: 8px; }
 
@@ -613,5 +779,6 @@ const submitReview = async () => {
 @media (max-width: 768px) {
   .hero-content { flex-direction: column; align-items: flex-start; }
   .poster-frame { width: 150px; }
+  .poster-form-inline { width: 150px; }
 }
 </style>
