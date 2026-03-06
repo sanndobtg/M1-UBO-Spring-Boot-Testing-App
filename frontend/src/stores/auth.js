@@ -35,6 +35,14 @@ export const useAuthStore = defineStore('auth', {
       this.user = null
       localStorage.removeItem('token')
       localStorage.removeItem('user')
+    },
+
+    // Action temporaire pour tester sans login
+    loginManuel(pseudo) {
+      this.user = { pseudo, nom: '', prenom: '', role: null }
+      this.token = pseudo
+      localStorage.setItem('token', pseudo)
+      localStorage.setItem('user', JSON.stringify(this.user))
     }
   }
 })

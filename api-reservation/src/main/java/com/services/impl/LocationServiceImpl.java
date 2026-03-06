@@ -28,7 +28,6 @@ import java.util.List;
 public class LocationServiceImpl implements LocationService {
 
     private static final int MAX_LOCATIONS_EN_COURS = 3;
-
     private final LocationRepository locationRepository;
     private final CompteRepository compteRepository;
     private final FilmRepository filmRepository;
