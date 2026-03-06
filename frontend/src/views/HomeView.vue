@@ -240,6 +240,7 @@ onMounted(async () => {
     const res = await filmService.getAll()
     const rawFilms = (res.data || []).slice(0, 6)
 
+    console.log(res);
     // Récupère tous les posters en parallèle
     const posterUrls = await Promise.all(
             rawFilms.map(f => fetchPosterUrl(f.title || f.titre))

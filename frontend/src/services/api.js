@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 const api = axios.create({
-  baseURL: '/api'  // axios envoie /api/comptes → Vite rewrite → /comptes → gateway
+  baseURL: ''  // axios envoie /api/comptes → Vite rewrite → /comptes → gateway
 })
 
 api.interceptors.request.use(config => {

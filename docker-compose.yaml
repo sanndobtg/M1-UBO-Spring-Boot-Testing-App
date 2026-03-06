@@ -50,7 +50,7 @@
       - "11083:8083"   # corrigé (probable)
     environment:
       SERVER_PORT: 11083
-      MONGODB_URI: mongodb://obiwan:27017
+      MONGODB_URI: mongodb://obiwan.univ-brest.fr:27017
     depends_on:
       - mariadb
 
@@ -63,4 +63,4 @@
       - "11084:11084"
     environment:
       SERVER_PORT: 11084
-      MONGODB_URI: mongodb://obiwan:27017
+      MONGODB_URI: mongodb://obiwan.univ-brest.fr:27017
