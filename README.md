@@ -253,7 +253,7 @@ chmod +x deploy.sh
 docker compose up -d
 
 ```
-> Le script `deploy.sh` à la racine du projet automatise les étapes : génération des JARs, construction des images Docker, push sur Docker Hub, et instructions de déploiement serveur.
+> Le script `deploy.sh` à la racine du projet automatise les étapes : génération des JARs, construction des images Docker, push sur Docker Hub.
 
 ### Frontend
 
