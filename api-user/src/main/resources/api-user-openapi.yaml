@@ -1,0 +1,241 @@
+openapi: 3.0.3
+info:
+  title: API User — Gestion des Comptes
+  version: 1.0.0
+  description: |
+    API REST pour la gestion des comptes utilisateurs de la plateforme VOD.
+    Implémentée avec Spring Boot + JPA (MariaDB).
+
+servers:
+  - url: http://info-tpsi.univ-brest.fr:11081
+    description: Serveur de production (accès direct)
+  - url: http://info-tpsi.univ-brest.fr:11080
+    description: Via Gateway
+
+paths:
+
+  /comptes:
+    get:
+      summary: Lister tous les comptes
+      operationId: getComptes
+      responses:
+        '200':
+          description: Liste des comptes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CompteDto'
+
+    post:
+      summary: Créer un nouveau compte
+      operationId: saveCompte
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CompteInput'
+            example:
+              pseudo: "testUser"
+              nom: "Dupont"
+              prenom: "Jean"
+              dateDeNaissance: "1995-06-15"
+              adresse: "Brest"
+              mdp: "1234"
+              role: "CLIENT"
+      responses:
+        '200':
+          description: Compte créé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CompteDto'
+
+  /comptes/{id}:
+    get:
+      summary: Récupérer un compte par ID
+      operationId: getCompte
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Compte trouvé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CompteDto'
+        '404':
+          description: Compte non trouvé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                message: "Le compte avec l'ID 99 n'existe pas"
+
+    put:
+      summary: Modifier un compte
+      operationId: updateCompte
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CompteInput'
+            example:
+              pseudo: "newPseudo"
+              nom: "Dupont"
+              prenom: "Marie"
+              dateDeNaissance: "1995-06-15"
+              adresse: "Paris"
+      responses:
+        '200':
+          description: Compte modifié
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CompteDto'
+        '404':
+          description: Compte non trouvé
+
+    delete:
+      summary: Supprimer un compte
+      operationId: deleteCompte
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Compte supprimé
+          content:
+            application/json:
+              schema:
+                type: boolean
+                example: true
+
+  /comptes/login:
+    post:
+      summary: Connexion d'un utilisateur
+      operationId: login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - pseudo
+                - mdp
+              properties:
+                pseudo:
+                  type: string
+                  example: "testUser"
+                mdp:
+                  type: string
+                  example: "1234"
+      responses:
+        '200':
+          description: Connexion réussie
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CompteDto'
+        '404':
+          description: Identifiants incorrects
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                message: "Identifiants incorrects"
+
+components:
+  schemas:
+
+    CompteDto:
+      type: object
+      description: Représentation d'un compte utilisateur (réponse)
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        role:
+          type: string
+          enum: [CLIENT, ADMIN]
+          nullable: true
+          example: "CLIENT"
+        pseudo:
+          type: string
+          example: "testuser"
+        nom:
+          type: string
+          example: "Dupont"
+        prenom:
+          type: string
+          example: "Jean"
+        dateDeNaissance:
+          type: string
+          example: "1995-06-15"
+          description: Format YYYY-MM-DD
+        adresse:
+          type: string
+          example: "Brest"
+        mdp:
+          type: string
+          nullable: true
+          example: null
+          description: Mot de passe (retourné null dans certaines réponses)
+
+    CompteInput:
+      type: object
+      description: Données pour créer ou modifier un compte
+      properties:
+        pseudo:
+          type: string
+          example: "testUser"
+        nom:
+          type: string
+          example: "Dupont"
+        prenom:
+          type: string
+          example: "Jean"
+        dateDeNaissance:
+          type: string
+          example: "1995-06-15"
+          description: Format YYYY-MM-DD
+        adresse:
+          type: string
+          example: "Brest"
+        mdp:
+          type: string
+          example: "1234"
+        role:
+          type: string
+          enum: [CLIENT, ADMIN]
+          nullable: true
+          example: "CLIENT"
+
+    Error:
+      type: object
+      properties:
+        message:
+          type: string

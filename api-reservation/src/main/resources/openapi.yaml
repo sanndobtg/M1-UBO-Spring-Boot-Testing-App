@@ -1,9 +1,8 @@
 openapi: 3.0.3
 info:
-  title: API de Gestion des Chiens et Réservations VOD
+  title: API de Gestion de Réservations VOD
   description: |
-    API REST permettant la gestion des chiens dans le système
-    et la gestion des réservations / locations de films (VOD).
+    API REST permettant la gestion des réservations / locations de films (VOD).
   version: 1.0.0
   contact:
     name: Support API
@@ -14,111 +13,10 @@ servers:
     description: Serveur de développement local
 
 tags:
-  - name: dogs
-    description: Opérations liées à la gestion des chiens
   - name: reservations
     description: Opérations liées à la location de films (VOD)
 
 paths:
-  # ──────────────────────────────────────────
-  #  DOGS
-  # ──────────────────────────────────────────
-  /dogs:
-    get:
-      tags:
-        - dogs
-      summary: Récupère tous les chiens
-      description: Retourne la liste complète des chiens enregistrés dans le système
-      operationId: getAllDogs
-      responses:
-        '200':
-          description: Liste des chiens récupérée avec succès
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/DogDto'
-        '500':
-          description: Erreur serveur interne
-
-    post:
-      tags:
-        - dogs
-      summary: Crée un nouveau chien
-      description: Ajoute un nouveau chien dans le système
-      operationId: createDog
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/DogDto'
-      responses:
-        '201':
-          description: Chien créé avec succès
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/DogDto'
-        '400':
-          description: Données invalides
-        '500':
-          description: Erreur serveur interne
-
-  /dogs/{id}:
-    get:
-      tags:
-        - dogs
-      summary: Récupère un chien par son ID
-      description: Retourne les détails d'un chien spécifique
-      operationId: getDogById
-      parameters:
-        - name: id
-          in: path
-          description: ID du chien à récupérer
-          required: true
-          schema:
-            type: integer
-            format: int64
-      responses:
-        '200':
-          description: Chien trouvé
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/DogDto'
-        '404':
-          description: Chien non trouvé
-        '500':
-          description: Erreur serveur interne
-
-    delete:
-      tags:
-        - dogs
-      summary: Supprime un chien
-      description: Supprime un chien du système par son ID
-      operationId: deleteDog
-      parameters:
-        - name: id
-          in: path
-          description: ID du chien à supprimer
-          required: true
-          schema:
-            type: integer
-            format: int64
-      responses:
-        '200':
-          description: Chien supprimé avec succès
-          content:
-            application/json:
-              schema:
-                type: boolean
-        '404':
-          description: Chien non trouvé
-        '500':
-          description: Erreur serveur interne
-
   # ──────────────────────────────────────────
   #  RESERVATIONS
   # ──────────────────────────────────────────
@@ -226,105 +124,6 @@ tags:
     description: Opérations liées à la location de films (VOD)
 
 paths:
-  # ──────────────────────────────────────────
-  #  DOGS
-  # ──────────────────────────────────────────
-  /dogs:
-    get:
-      tags:
-        - dogs
-      summary: Récupère tous les chiens
-      description: Retourne la liste complète des chiens enregistrés dans le système
-      operationId: getAllDogs
-      responses:
-        '200':
-          description: Liste des chiens récupérée avec succès
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/DogDto'
-        '500':
-          description: Erreur serveur interne
-
-    post:
-      tags:
-        - dogs
-      summary: Crée un nouveau chien
-      description: Ajoute un nouveau chien dans le système
-      operationId: createDog
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/DogDto'
-      responses:
-        '201':
-          description: Chien créé avec succès
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/DogDto'
-        '400':
-          description: Données invalides
-        '500':
-          description: Erreur serveur interne
-
-  /dogs/{id}:
-    get:
-      tags:
-        - dogs
-      summary: Récupère un chien par son ID
-      description: Retourne les détails d'un chien spécifique
-      operationId: getDogById
-      parameters:
-        - name: id
-          in: path
-          description: ID du chien à récupérer
-          required: true
-          schema:
-            type: integer
-            format: int64
-      responses:
-        '200':
-          description: Chien trouvé
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/DogDto'
-        '404':
-          description: Chien non trouvé
-        '500':
-          description: Erreur serveur interne
-
-    delete:
-      tags:
-        - dogs
-      summary: Supprime un chien
-      description: Supprime un chien du système par son ID
-      operationId: deleteDog
-      parameters:
-        - name: id
-          in: path
-          description: ID du chien à supprimer
-          required: true
-          schema:
-            type: integer
-            format: int64
-      responses:
-        '200':
-          description: Chien supprimé avec succès
-          content:
-            application/json:
-              schema:
-                type: boolean
-        '404':
-          description: Chien non trouvé
-        '500':
-          description: Erreur serveur interne
-
   # ──────────────────────────────────────────
   #  RESERVATIONS
   # ──────────────────────────────────────────
